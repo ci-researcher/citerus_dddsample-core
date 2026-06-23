@@ -4,10 +4,7 @@ permissions:
   contents: write
 
 on:
-  pull_request:
-    branches: [ "*" ]
-  push:
-    branches: [ "master" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -15,9 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          java-version: '17'
+          java-version: '${{ matrix.java }}'
           distribution: 'temurin'
           cache: maven
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
@@ -30,3 +27,9 @@ jobs:
       - name: Update dependency graph
         uses: advanced-security/maven-dependency-submission-action@v4
         continue-on-error: true # optional as this step consistently fails for forked repos by design
+    strategy:
+      matrix:
+        java:
+          - 21
+          - 25
+      fail-fast: false
